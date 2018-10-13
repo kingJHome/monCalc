@@ -1,6 +1,9 @@
 #ifndef _INTCALC_FUN
 #define _INTCALC_FUN
 
+#include <assert.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct charOp{
@@ -17,6 +20,9 @@ int expressionValid(char *press);
 
 //运算符优先级判断
 int priorityCal(char prev,char next);
+
+//栈是否为空
+int emptyStack(CharOp *so);
 
 //栈容量增加
 void addStackSize(CharOp *so);
