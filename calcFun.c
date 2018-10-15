@@ -4,14 +4,14 @@ void removeSpace(char *strs){
 	char *spacer = NULL;
 
 	while( (spacer = strchr(strs,' ')) != NULL ){
-		*(spacer - 1) = *spacer;
+		*spacer = *(spacer + 1);
 	}
 }
 
 //是否是运算符(包括括号)
 int inOp(char inchar){
 	int isOp = 0;
-	char ops = "+-*/()";
+	char ops[] = "+-*/()";
 
 	if( strchr(ops, inchar) ){
 		isOp = 1;
@@ -82,6 +82,18 @@ int priorityCal(char prev,char next){
 	return priority;
 }
 
+//初始化栈
+void initStack(CharOp **so,onChose type){
+	(*so)->cp = type;
+	if( type == Op ){
+		(*so)->onW.ops = NULL;
+	}else{
+		(*so)->onW.nums = NULL;
+	}
+	(*so)->curPos = 0;
+	(*so)->length = 0;
+}
+
 //栈是否为空
 int emptyStack(CharOp *so){
 	int empty = 0;
@@ -97,38 +109,62 @@ int emptyStack(CharOp *so){
 void addStackSize(CharOp *so){
 	if( so->curPos == so->length ){//栈满,申请更多空间
 		int newlen = 0;
-		if( so->chars == NULL ){
-			newlen = 1;
-			so->chars = (char*)malloc(sizeof(char));
+		
+		if( so->cp == Op ){
+			if( so->onW.ops == NULL ){
+				newlen = 1;
+				so->onW.ops = (char*)malloc(sizeof(char));
+			}else{
+				newlen = so->length + so->length / 2 + 1;
+				char *result = (char*)realloc(so->onW.ops,newlen * sizeof(char));
+			}
+			assert( so->onW.ops );
 		}else{
-			int newlen = so->length + so->length / 2 + 1;					
-			realloc(so->chars,newlen * sizeof(char));
-		}
-		assert( so->chars );
+			if( so->onW.nums == NULL ){
+				newlen = 1;
+				so->onW.nums = (int*)malloc(sizeof(int));
+			}else{
+				newlen = so->length + so->length / 2 + 1;
+				int *result = (int*)realloc(so->onW.nums,newlen * sizeof(int));
+			}
+			assert( so->onW.nums );
+		}		
 		so->length = newlen;
 	}
 }
 
 //入栈
-void enStack(CharOp *so,char inc){
-	addStackSize(so);	
-	so->chars[so->curPos++] = inc;
+void enStack(CharOp *so,void *inc){
+	addStackSize(so);
+	if( so->cp == Op ){
+		so->onW.ops[so->curPos++] = *(char*)inc;
+	}else{
+		so->onW.nums[so->curPos++] = *(int*)inc;
+	}
 }
 
 //出栈
-void deStack(CharOp *so,char *gc){
+void deStack(CharOp *so,void *gc){
 	if( so->curPos ){
-		*gc = so->chars[so->curPos--];
+		if( so->cp == Op){
+			char *op = (char*)gc;
+			*op = so->onW.ops[so->curPos--];
+		}else{
+			int *num = (int*)gc;
+			*num = so->onW.nums[so->curPos--];
+		}
 	}
 }
 
 //获取栈顶元素
-char getTop(CharOp *so){
-	char result = '\0';
-
+void* getTop(CharOp *so){
 	if( so->length ){
-		result = so->chars[so->curPos-1];
+		if( so->cp== Op ){
+			return so->onW.ops+so->curPos-1;
+		}else{
+			return so->onW.nums+so->curPos-1;
+		}
+	}else{
+		return NULL;
 	}
-	
-	return result;
 }

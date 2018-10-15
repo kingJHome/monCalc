@@ -6,8 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef enum{Op,Num}onChose;
+
 typedef struct charOp{
-	char *chars;
+	onChose cp;
+	union{
+		char *ops;
+		int *nums;
+	}onW;
 	int curPos;
 	int length;
 }CharOp;
@@ -21,6 +27,9 @@ int expressionValid(char *press);
 //运算符优先级判断
 int priorityCal(char prev,char next);
 
+//初始化栈
+void initStack(CharOp **so,onChose type);
+
 //栈是否为空
 int emptyStack(CharOp *so);
 
@@ -28,11 +37,11 @@ int emptyStack(CharOp *so);
 void addStackSize(CharOp *so);
 
 //入栈
-void enStack(CharOp *so,char inc);
+void enStack(CharOp *so,void *inc);
 
 //出栈
-void deStack(CharOp *so,char *gc);
+void deStack(CharOp *so,void *gc);
 
 //获取栈顶元素
-char getTop(CharOp *so);
+void* getTop(CharOp *so);
 #endif

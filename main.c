@@ -22,22 +22,24 @@ char* itoa(int num){
 }
 
 void expressCalculation(char *content){
-	CharOp opChar = {NULL,0,0},
-		   numChar = {NULL,0,0};
-	size_t clen = strlen(content);
-	
-	//for( )
+	if( expressionValid(content) ){
+		printf("%s\n", content);
+		CharOp *opss = NULL,*numss = NULL;
+		
+		initStack( &opss, Op );
+		initStack( &numss, Num );
+	}
 }
 
 void readFileContent(char *filename,char *content){
 	FILE *fp = fopen(filename,"r");
 
 	if( fp ){
-		char delim[] = "\n";
+		char sep = '\n';
 		size_t clen = 0;
 
 		while( getline(&content, &clen, fp)!=-1 ){
-			char *endFlag = strchr(content, delim);
+			char *endFlag = strchr(content, sep);
 
 			clen = 0;
 			*endFlag = '\0';
