@@ -1,5 +1,13 @@
 #include "calcFun.h"
 
+void removeSpace(char *strs){
+	char *spacer = NULL;
+
+	while( (spacer = strchr(strs,' ')) != NULL ){
+		*(spacer - 1) = *spacer;
+	}
+}
+
 //是否是运算符(包括括号)
 int inOp(char inchar){
 	int isOp = 0;
@@ -12,52 +20,66 @@ int inOp(char inchar){
 	return isOp;
 }
 
-//表达式是否正确
+//表达式括号是否匹配正确
 int expressionValid(char *press){
 	int valid = 1,
 		lbra = 0,
 		rbra = 0;
-	char *curChar = strdup(press);
 	size_t pos = 0,
-		   plen = strlen(curChar);
+		   plen = 0;
 	
+	//清除空格
+	removeSpace(press);
+	plen = strlen(press);
+
 	//检测括号是否正确
 	for( ; pos < plen; ++pos){
-		if(	curChar[pos]=='(' ){
+		if(	press[pos]=='(' ){
 			lbra++;
 		}
-		if( curChar[pos]==')' ){
+		if( press[pos]==')' ){
 			rbra++;
 		}
 	}
 	if( lbra != rbra ){
 		valid = 0;
-	}else{//检测四则运算符号表达式是否正确
-		char sepe[] = "+-*/",
-			 *sval = NULL;
-
-		if( strspn(curChar, sepe) ){//表达式以运算符开头
-			valid = 0;
-		}else{
-			for( pos = 0; pos < plen; ++pos){
-				if( curChar[pos]=='(' || curChar[pos]==')' ){
-					curChar[pos] = '@';
-				}else if( isdigit(curChar[pos]) ){
-					curChar[pos] = '#';
-				}
-			}
-
-			while( sval = strsep(&curChar, sepe) ){
-			}
-		}
 	}
-	free(curChar);
 
 	return valid;
 }
 
 //运算符优先级判断
 int priorityCal(char prev,char next){
+	int priority = 0;
+
+	switch( prev ){
+		case '+': case '-':
+			if(next=='+' || next=='-' || next==')'){
+				priority = 1;
+			}else if(next=='*' || next=='/' || next=='('){
+				priority = -1;
+			}
+			break;
+		case '*': case '/':
+			if(next=='+' || next=='-' || next=='*' || next=='/' || next==')'){
+				priority = 1;
+			}else if(next=='('){
+				priority = -1;
+			}
+			break;
+		case '(':
+			if(next==')'){
+				priority = 0;
+			}else{
+				priority = -1;
+			}
+			break;
+		case ')':
+			priority = -1;
+			break;
+	}
+
+	return priority;
 }
 
 //栈是否为空

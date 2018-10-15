@@ -15,7 +15,7 @@ typedef struct charOp{
 //是否是运算符(包括括号)
 int inOp(char inchar);
 
-//表达式是否正确
+//表达式括号是否匹配正确
 int expressionValid(char *press);
 
 //运算符优先级判断
