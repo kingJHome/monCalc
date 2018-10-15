@@ -4,7 +4,10 @@ void removeSpace(char *strs){
 	char *spacer = NULL;
 
 	while( (spacer = strchr(strs,' ')) != NULL ){
-		*spacer = *(spacer + 1);
+		while( *spacer!='\0'){
+			*spacer = *(spacer + 1);
+			spacer++;
+		}
 	}
 }
 
@@ -84,6 +87,10 @@ int priorityCal(char prev,char next){
 
 //初始化栈
 void initStack(CharOp **so,onChose type){
+	if( *so == NULL ){
+		*so = (CharOp*)malloc(sizeof(CharOp));		
+	}
+	
 	(*so)->cp = type;
 	if( type == Op ){
 		(*so)->onW.ops = NULL;
@@ -98,7 +105,7 @@ void initStack(CharOp **so,onChose type){
 int emptyStack(CharOp *so){
 	int empty = 0;
 	
-	if( so->length==0 ){
+	if( so->length==0 || so->curPos==0 ){
 		empty = 1;
 	}
 
