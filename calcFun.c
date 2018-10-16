@@ -14,7 +14,7 @@ void removeSpace(char *strs){
 //是否是运算符(包括括号)
 int inOp(char inchar){
 	int isOp = 0;
-	char ops[] = "+-*/()";
+	char ops[] = "+-*/()#";
 
 	if( strchr(ops, inchar) ){
 		isOp = 1;
@@ -54,32 +54,36 @@ int expressionValid(char *press){
 //运算符优先级判断
 int priorityCal(char prev,char next){
 	int priority = 0;
-
-	switch( prev ){
-		case '+': case '-':
-			if(next=='+' || next=='-' || next==')'){
-				priority = 1;
-			}else if(next=='*' || next=='/' || next=='('){
+	
+	if( next=='#' ){
+		priority = 1;
+	}else{
+		switch( prev ){
+			case '+': case '-':
+				if(next=='+' || next=='-' || next==')'){
+					priority = 1;
+				}else if(next=='*' || next=='/' || next=='('){
+					priority = -1;
+				}
+				break;
+			case '*': case '/':
+				if(next=='+' || next=='-' || next=='*' || next=='/' || next==')'){
+					priority = 1;
+				}else if(next=='('){
+					priority = -1;
+				}
+				break;
+			case '(':
+				if(next==')'){
+					priority = 0;
+				}else{
+					priority = -1;
+				}
+				break;
+			case ')':
 				priority = -1;
-			}
-			break;
-		case '*': case '/':
-			if(next=='+' || next=='-' || next=='*' || next=='/' || next==')'){
-				priority = 1;
-			}else if(next=='('){
-				priority = -1;
-			}
-			break;
-		case '(':
-			if(next==')'){
-				priority = 0;
-			}else{
-				priority = -1;
-			}
-			break;
-		case ')':
-			priority = -1;
-			break;
+				break;
+		}
 	}
 
 	return priority;
@@ -154,11 +158,17 @@ void enStack(CharOp *so,void *inc){
 void deStack(CharOp *so,void *gc){
 	if( so->curPos ){
 		if( so->cp == Op){
-			char *op = (char*)gc;
-			*op = so->onW.ops[so->curPos--];
+			char op = so->onW.ops[--so->curPos];
+			if( gc ){
+				char *rt = (char*)gc;
+				*rt = op;
+			}
 		}else{
-			int *num = (int*)gc;
-			*num = so->onW.nums[so->curPos--];
+			int num = so->onW.nums[--so->curPos];
+			if( gc ){
+				int *rt = (int*)gc;
+				*rt = num;
+			}
 		}
 	}
 }
